@@ -4,13 +4,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Visualization Project</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src = 'choroplethMap.js'></script>
+    <script src="https://d3js.org/d3.v4.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+<style>
+    body {
+        background-color: #F2F3F6;
+  min-height: 100%;
+  font-family: "Verdana", sans-serif;
+}
+
+h1 {
+    margin: 0;
+    font-size: 20px;
+    text-align: center;
+}
+
+#legend {
+    font-size: 0.7em;
+    letter-spacing: 0.1;
+}
+
+.map {
+    padding: 20px;
+    background-color: #FFFFFF;
+    border: 1px solid #4D8DC4;
+    box-shadow: 1px 1px 15px #000000;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+div.tooltip {   
+  position: absolute;
+  padding: 7px;
+  font-size: 0.8em;
+  pointer-events: none;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.25);
+}  
+
+.background {
+    fill: transparent;
+    pointer-evens: all;
+}
+
+.world {
+    transform-origin: center;
+}
+    </style>
 </head>
 <body>
     <h1>Course Project</h1>
     <h3> Kyndra-Max-Preetham-Shashank-Worifung-Private</h3>
-    <div id="choropleth"></div>
-    
-</body>
-</html>
+    <div class="map">
+        <h1>World population map</h1>
+        <div id="selection"> </div>
+        <svg id="my_dataviz" width="800" height="450"></svg></div>
+        
+        <script src = 'choroplethMap.js'></script>
+    </body>
+    </html>
