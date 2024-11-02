@@ -1,27 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Visualization Project</title>
-    <script src="https://d3js.org/d3.v4.js"></script>
-<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
-<style>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Data Visualization Project</title>
+        <script src="https://d3js.org/d3.v4.js"></script>
+        <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+        <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+        <style>
+            body{
+                display: flex;
+            }
 
     </style>
-</head>
-<body>
-    <h1>Course Project</h1>
-    <h3> Kyndra-Max-Preetham-Shashank-Worifung-Private</h3>
-    <div class="map">
-        <h1>World population map</h1>
-        <div id="selection"> </div>
-        <div class="tooltip" style="position: absolute; opacity: 0; background: white; padding: 5px; border: 1px solid black; pointer-events: none;"></div>
-        <svg id="my_dataviz" width="800" height="450"></svg></div>
+    </head>
+    <body>
+        <h1>Course Project</h1>
+        <h3> Kyndra-Max-Preetham-Shashank-Worifung-Private</h3>
+        <div class="map">
+            <h1>World population map</h1>
+            <div id="yearSelector"></div>
+
+            <div class="tooltip"
+                style="position: absolute; opacity: 0; background: white; padding: 5px; border: 1px solid black; pointer-events: none;"></div>
+            <svg id="my_dataviz" width="800" height="450"></svg></div>
         <!-- tooltip for choropleth map -->
 
-        
-        <script src = 'choroplethMap.js'></script>
+        <script src='choroplethMap.js'></script>
     </body>
-    </html>
+</html>
