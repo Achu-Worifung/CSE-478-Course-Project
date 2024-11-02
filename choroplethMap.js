@@ -12,9 +12,10 @@ var path = d3.geoPath().projection(projection);
 
 // Prepare data container and color scale
 var data = d3.map();
-var colorScale = d3.scaleLinear()
-    .domain([0, 10]) // Set the domain based on your data range
-    .range(["#f7fbff", "#08306b"]); // Specify a gradient from light blue to dark blue
+var colorScale = d3.scaleSequential()
+    .domain([0, 10]) // Set domain based on your data range
+    .interpolator(d3.interpolateBlues); // Use a blue gradient
+
 
 
 // Load GeoJSON and CSV data
@@ -27,30 +28,54 @@ d3.queue()
 
 function ready(error, topo) {
   if (error) throw error;
+  const tooltip = d3.select(".tooltip");
 
   //for hover effect
-  let mouseOver = function(d) {
-    d3.selectAll(".Country")
-      .transition()
-      .duration(200)
-      .style("opacity", .5)
-    d3.select(this)
-      .transition()
-      .duration(200)
-      .style("opacity", 1)
-      .style("stroke", "black")
-  }
+// Mouse over event
+let mouseOver = function(event, d) {
+  // console.log('in mouse over', event);
+  console.log('event', event.properties.name);
+  
 
-  let mouseLeave = function(d) {
-    d3.selectAll(".Country")
-      .transition()
-      .duration(200)
-      .style("opacity", .8)
-    d3.select(this)
-      .transition()
-      .duration(200)
-      .style("stroke", "transparent")
-  }
+  // Set opacity for all countries
+  d3.selectAll(".Country")
+    .transition()
+    .duration(200)
+    .style("opacity", 0.5);
+
+  // Set opacity for the hovered country
+  d3.select(this)
+    .transition()
+    .duration(200)
+    .style("opacity", 1)
+    .style("stroke", "black");
+
+  // Update the tooltip text and position
+  tooltip
+    .style("opacity", 1)
+    // .style("background-color", "black")
+    .html(`Country name: ${event.properties.name} <br> Ladder score: ${event.total}`)
+    .style("left", (event.pageX + 5) + "px") // Adjust tooltip position
+    .style("top", (event.pageY - 28) + "px"); // Adjust tooltip position
+};
+
+// Mouse leave event
+let mouseLeave = function(d) {
+  // Reset opacity for all countries
+  d3.selectAll(".Country")
+    .transition()
+    .duration(200)
+    .style("opacity", 0.8);
+
+  // Reset the stroke for the hovered country
+  d3.select(this)
+    .transition()
+    .duration(200)
+    .style("stroke", "transparent");
+
+  // Hide the tooltip
+  tooltip.style("opacity", 0);
+};
 
   // Draw the map
   svg.append("g")
@@ -59,13 +84,14 @@ function ready(error, topo) {
     .enter()
     .append("path")
       .attr("d", path)
+      .attr("class", function(d){ return "Country" } ) // Assign a class for styling
       .attr("fill", function(d) {
         var countryName = d.properties.name;
         d.total = data.get(countryName) || 0;
         // console.log('total', d.total);
         // console.log('countryName', countryName);
 
-        console.log('colorScale', colorScale(d.total));
+        // console.log('colorScale', colorScale(d.total));
         
         
         
