@@ -173,7 +173,7 @@ for (let i = 2005; i <= 2021; i++) {
   }
 }
 html += `</select>`;
-yearSelector.innerHTML = html; // Set the inner HTML of the selector
+yearSelector.innerHTML += html; // Set the inner HTML of the selector
 
 // Attach an event listener to the dropdown
 yearSelector.addEventListener("change", (e) => {

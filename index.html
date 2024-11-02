@@ -10,6 +10,31 @@
         <style>
             body{
                 display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                width: 100vw;
+                min-width: 1000px;
+
+            }
+            select 
+            {
+                width: 100px;
+                text-align: center;
+                padding: 5px;
+                font-size: large;
+                margin-bottom: 15px;
+            }
+            #yearSelector {
+                font-size: large;
+            }
+            #my_dataviz
+
+            {
+                border: 1px solid black;
+                margin-bottom: 29px;
+                border-radius: 20px;
+                background-color: #A4D7E1;
             }
 
     </style>
@@ -19,7 +44,7 @@
         <h3> Kyndra-Max-Preetham-Shashank-Worifung-Private</h3>
         <div class="map">
             <h1>World population map</h1>
-            <div id="yearSelector"></div>
+            <div id="yearSelector">Please select a year:</div>
 
             <div class="tooltip"
                 style="position: absolute; opacity: 0; background: white; padding: 5px; border: 1px solid black; pointer-events: none;"></div>
