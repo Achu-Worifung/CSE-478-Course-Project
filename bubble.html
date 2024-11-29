@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>World Happiness Report Bubble Chart</title>
+        <script src="https://d3js.org/d3.v6.js"></script>
+        <style>
+            body { font-family: Arial, sans-serif; }
+            .bubble { stroke: black; stroke-width: 0.5; }
+        </style>
+    </head>
+    <body>
+        <div>
+            <h2>Ladder score vs</h2>
+            <select id="yAxisSelect">
+                <option value="Social_support">Social Support</option>
+                <option value="Healthy_life_expectancy">Healthy Life Expectancy</option>
+                <option value="Freedom_to_make_life_choices">Freedom to Make Life Choices</option>
+                <option value="Generosity">Generosity</option>
+                <option value="Perceptions_of_corruption">Perceptions of Corruption</option>
+                <option value="GDP_per_capita">GDP per Capita</option>
+            </select>
+        </div>
+        <div id="my_dataviz"></div>
+        
+        <script>
+        // set the dimensions and margins of the graph
+        var margin = {top: 10, right: 20, bottom: 30, left: 50},
+            width = 500 - margin.left - margin.right,
+            height = 420 - margin.top - margin.bottom;
+
+        // append the svg object to the body of the page
+        var svg = d3.select("#my_dataviz")
+            .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+
+        // Function to update the chart
+        function updateChart(yVariable) {
+            // Clear previous chart
+            svg.selectAll("*").remove();
+
+            // Re-add X axis (Ladder Score goes from 0 to 10)
+            const x = d3.scaleLinear()
+                .domain([0, 10])
+                .range([0, width]);
+            svg.append("g")
+                .attr("transform", `translate(0, ${height})`)
+                .call(d3.axisBottom(x))
+                .append("text")
+                    .attr("x", width / 2)
+                    .attr("y", margin.bottom)
+                    .attr("fill", "black")
+                    .text("Ladder Score");
+
+            // Load the CSV data
+            d3.csv('./datasets/world-happiness-report-2005-2021.csv').then(function(data) {
+                // Filter for a specific year (e.g., 2021)
+                const filteredData = data.filter(d => d.year === "2021");
+
+                // Add Y axis (Dynamic based on selected variable)
+                const y = d3.scaleLinear()
+                    .domain([0, d3.max(filteredData, d => +d[yVariable])])
+                    .range([height, 0]);
+                svg.append("g")
+                    .call(d3.axisLeft(y))
+                    .append("text")
+                        .attr("transform", "rotate(-90)")
+                        .attr("y", -margin.left)
+                        .attr("x", -height / 2)
+                        .attr("fill", "black")
+                        .text(yVariable.replace(/_/g, ' '));
+
+                // Add a scale for bubble size (Population)
+                const z = d3.scaleLinear()
+                    .domain([d3.min(filteredData, d => +d['Social support']), 
+                             d3.max(filteredData, d => +d['Social support'])])
+                    .range([4, 40]);
+
+                // Create color scale for countries
+                const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+                // Add bubbles
+                svg.append('g')
+                    .selectAll('dot')
+                    .data(filteredData)
+                    .enter()
+                    .append('circle')
+                        .attr("class", "bubble")
+                        .attr("cx", d => x(+d['Ladder_score']))
+                        .attr("cy", d => y(+d[yVariable]))
+                        // .attr("r", d => z(+d.population))
+                        .style("fill", d => color(d.Country_name))
+                        .style("opacity", "0.7")
+                    .append("title")
+                        .text(d => `${d.Country_name}\nLadder Score: ${d['Ladder_score']}\n${yVariable.replace(/_/g, ' ')}: ${d[yVariable]}\nPopulation: ${d.population}`);
+
+            }).catch(function(error) {
+                console.log("Error loading the CSV file:", error);
+            });
+        }
+
+        // Initial chart load
+        updateChart('Social_support');
+
+        // Add event listener to select element
+        document.getElementById('yAxisSelect').addEventListener('change', function() {
+            updateChart(this.value);
+        });
+        </script>
+    </body>
+</html>

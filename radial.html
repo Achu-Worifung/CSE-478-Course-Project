@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radial Bar Chart</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        .bar {
+            fill-opacity: 0.7;
+            transition: fill 0.3s;
+        }
+
+        .bar:hover {
+            fill-opacity: 1;
+        }
+
+        .tooltip {
+            position: absolute;
+            text-align: center;
+            width: 100px;
+            padding: 5px;
+            background: lightgrey;
+            border: 1px solid black;
+            border-radius: 5px;
+            pointer-events: none;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+    <svg id="radial-chart" width="600" height="600"></svg>
+    <div class="tooltip"></div>
+
+    <script>
+        // Data: Replace this with your data
+        const data = [
+            { label: "Not Serious", value: 3 },
+            { label: "Average", value: 5 },
+            { label: "Serious", value: 7 },
+            { label: "Very Serious", value: 8 }
+        ];
+
+        // Dimensions
+        const width = 600;
+        const height = 600;
+        const radius = Math.min(width, height) / 2 - 40;
+
+        // Create SVG
+        const svg = d3.select("#radial-chart")
+            .append("g")
+            .attr("transform", `translate(${width / 2}, ${height / 2})`);
+
+        // Create a scale for the color
+        const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+
+        // Create arcs for each category
+        const arcGenerator = d3.arc()
+            .innerRadius(0)
+            .outerRadius(d => radius * (d.value / d3.max(data, d => d.value)))
+            .startAngle((d, i) => (i * Math.PI * 2) / data.length)
+            .endAngle((d, i) => ((i + 1) * Math.PI * 2) / data.length);
+
+        svg.selectAll("path")
+            .data(data)
+            .enter()
+            .append("path")
+            .attr("class", "bar")
+            .attr("d", arcGenerator)
+            .attr("fill", (d, i) => colorScale(i))
+            .on("mouseover", function(event, d) {
+                d3.select(".tooltip")
+                    .style("opacity", 1)
+                    .html(`${d.label}: ${d.value}`)
+                    .style("left", (event.pageX + 5) + "px")
+                    .style("top", (event.pageY - 28) + "px");
+            })
+            .on("mouseout", function() {
+                d3.select(".tooltip").style("opacity", 0);
+            });
+    </script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D3 Circular Bar Chart Tutorial</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <h1>D3 Circular Bar Chart Tutorial</h1>
+    <p>
+        Learn to create a circular bar chart using D3.js! This chart visualizes data in a radial format, making it compact and visually engaging.
+    </p>
+    <script>
+        // Set up basic parameters
+        let width = 600, height = 600;
+        let categories = ['A', 'B', 'C', 'D', 'E'];
+        let colors = ['darkorange', 'yellow', 'lime', 'cyan', 'magenta'];
+
+        // Generate random data for each category
+        let data = categories.map((c, i) => ({
+            name: c,
+            value: Math.floor(1 + 98 * Math.random()),
+            color: colors[i]
+        }));
+        console.log('here is the data', data);
+        
+
+        // Add SVG element
+        let svg = d3.select("body").append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        // Define chart radius and bar width
+        let chartRadius = width / 2 - 50;
+        let barPadding = 10;
+        let barWidth = chartRadius / categories.length - barPadding;
+
+        // Calculate the inner radius for each bar
+        data.forEach((d, i) => {
+            d.radius = (chartRadius / categories.length) * i + barPadding;
+        });
+
+        // Create radial axis (concentric circles) for gridlines
+        let rAxis = svg.append("g");
+        rAxis.selectAll("circle")
+            .data(data)
+            .join(enter =>
+                enter.append('circle')
+                    .attr('r', d => d.radius + barWidth)
+                    .attr('cx', width / 2)
+                    .attr('cy', height / 2)
+                    .attr('fill', 'none')
+                    .style('stroke', 'silver')
+            );
+
+        // Define ticks for grid lines extending outward
+        let ticks = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90];
+        let angle = d3.scaleLinear().domain([0, 100]).range([0, 2 * Math.PI]);
+
+        // Helper function for x and y coordinates based on angle and radius
+        let coord = (value, radius) => {
+            let a = angle(value) + Math.PI / 2;
+            return {
+                x: Math.cos(a) * radius + width / 2,
+                y: Math.sin(a) * radius + height / 2
+            };
+        };
+
+        // Create radial lines for the circular grid
+        let thetaAxis = svg.append("g");
+        thetaAxis.selectAll("line")
+            .data(ticks)
+            .join(enter =>
+                enter.append("line")
+                    .attr('x1', width / 2)
+                    .attr('y1', height / 2)
+                    .attr('x2', d => coord(d, chartRadius).x)
+                    .attr('y2', d => coord(d, chartRadius).y)
+                    .style('stroke', 'silver')
+            );
+
+        // Arc generator to create bars
+        let arc = d3.arc()
+            .innerRadius(d => d.radius)
+            .outerRadius(d => d.radius + barWidth)
+            .startAngle(0)
+            .endAngle(d => angle(d.value));
+
+        // Draw bars with colors and position them around the circle
+        let bars = svg.append('g');
+        bars.selectAll('path')
+            .data(data)
+            .join(enter => enter.append('path')
+                .style('fill', d => d.color)
+                .attr('d', d => arc(d))
+                .attr('transform', `translate(${width / 2}, ${height / 2})`));
+    </script>
+</body>
+</html>

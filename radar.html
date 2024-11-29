@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Country Metrics Radar Chart</title>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        #container {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .tooltip {
+            position: absolute;
+            background: white;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            pointer-events: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .legend-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-right: 30px;
+        }
+        .legend-item {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .legend-item:hover text {
+            font-weight: bold;
+        }
+        .legend-color-box {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+        }
+    </style>
+    </head>
+    <body>
+        <div id="container">
+            <div class="legend-container" id="legend"></div>
+            <div id="chart"></div>
+        </div>
+        <script>
+        // Sample data - replace with your actual dataset
+        const data = [
+            {
+                country: 'Finland',
+                metrics: {
+                    'Ladder Score': 7.8,
+                    'GDP per Capita': 48900,
+                    'Social Support': 0.954,
+                    'Healthy Life Expectancy': 72,
+                    'Freedom to Make Life Choices': 0.86,
+                    'Generosity': 0.21
+                }
+            },
+            {
+                country: 'Denmark',
+                metrics: {
+                    'Ladder Score': 7.6,
+                    'GDP per Capita': 60170,
+                    'Social Support': 0.968,
+                    'Healthy Life Expectancy': 72.2,
+                    'Freedom to Make Life Choices': 0.89,
+                    'Generosity': 0.24
+                }
+            },
+            {
+                country: 'Switzerland',
+                metrics: {
+                    'Ladder Score': 7.5,
+                    'GDP per Capita': 94070,
+                    'Social Support': 0.942,
+                    'Healthy Life Expectancy': 74.4,
+                    'Freedom to Make Life Choices': 0.91,
+                    'Generosity': 0.26
+                }
+            }
+        ];
+
+            
+        class RadarChart {
+            constructor(containerId, legendId, data) {
+                this.containerId = containerId;
+                this.legendId = legendId;
+                this.data = data;
+
+                // Normalize data to 0-1 scale
+                this.normalizeData();
+                this.setupChart();
+            }
+
+            normalizeData() {
+                // Find max values for each metric
+                const maxValues = {};
+                const metrics = Object.keys(this.data[0].metrics);
+                // console.log('here are the metrics', metrics);
+                
+
+                metrics.forEach(metric => {
+                    console.log('here is the metric', metric);
+                    maxValues[metric] = Math.max(
+                        ...this.data.map(d => d.metrics[metric])
+                    );
+                });
+
+                // Normalize each dataset
+                this.normalizedData = this.data.map(country => ({
+                    country: country.country,
+                    metrics: Object.fromEntries(
+                        Object.entries(country.metrics).map(([metric, value]) => 
+                            [metric, value / maxValues[metric]]
+                        )
+                    )
+                }));
+            }
+
+            setupChart() {
+                const width = 500;
+                const height = 500;
+                const metrics = Object.keys(this.normalizedData[0].metrics);
+                const angleSlice = Math.PI * 2 / metrics.length;
+
+                // Clear previous chart
+                d3.select(this.containerId).html('');
+                d3.select(this.legendId).html('');
+
+                const svg = d3.select(this.containerId)
+                    .append('svg')
+                    .attr('width', width)
+                    .attr('height', height);
+
+                const g = svg.append('g')
+                    .attr('transform', `translate(${width/2},${height/2})`);
+
+                // Create tooltip
+                const tooltip = d3.select('body')
+                    .append('div')
+                    .attr('class', 'tooltip')
+                    .style('opacity', 0);
+
+                // Draw background polygon grid
+                const levels = 5;
+                const backgroundPolygon = g.selectAll('.background-polygon')
+                    .data(d3.range(1, levels + 1))
+                    .enter()
+                    .append('polygon')
+                    .attr('class', 'background-polygon')
+                    .attr('points', d => {
+                        return metrics.map((_, i) => {
+                            const radius = (d / levels) * (width / 2 - 50);
+                            const x = radius * Math.cos(angleSlice * i - Math.PI / 2);
+                            const y = radius * Math.sin(angleSlice * i - Math.PI / 2);
+                            return `${x},${y}`;
+                        }).join(' ');
+                    })
+                    .attr('fill', 'none')
+                    .attr('stroke', '#e0e0e0')
+                    .attr('stroke-width', 1);
+
+                // Draw axis lines
+                const axisLines = g.selectAll('.axis')
+                    .data(metrics)
+                    .enter()
+                    .append('line')
+                    .attr('x1', 0)
+                    .attr('y1', 0)
+                    .attr('x2', (_, i) => (width/2 - 50) * Math.cos(angleSlice * i - Math.PI / 2))
+                    .attr('y2', (_, i) => (width/2 - 50) * Math.sin(angleSlice * i - Math.PI / 2))
+                    .attr('stroke', '#c0c0c0')
+                    .attr('stroke-width', 1);
+
+                // Draw axis labels
+                const axisLabels = g.selectAll('.axis-label')
+                    .data(metrics)
+                    .enter()
+                    .append('text')
+                    .attr('x', (_, i) => (width/2 - 30) * Math.cos(angleSlice * i - Math.PI / 2))
+                    .attr('y', (_, i) => (width/2 - 30) * Math.sin(angleSlice * i - Math.PI / 2))
+                    .text(d => d)
+                    .attr('text-anchor', 'middle')
+                    .attr('alignment-baseline', 'middle')
+                    .attr('font-size', 10);
+
+                // Color palette
+                const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+
+                // Draw country polygons
+                const radarLines = g.selectAll('.radar-line')
+                    .data(this.normalizedData)
+                    .enter()
+                    .append('polygon')
+                    .attr('class', 'radar-polygon')
+                    .attr('points', d => {
+                        return metrics.map((metric, i) => {
+                            const radius = d.metrics[metric] * (width/2 - 50);
+                            const x = radius * Math.cos(angleSlice * i - Math.PI / 2);
+                            const y = radius * Math.sin(angleSlice * i - Math.PI / 2);
+                            return `${x},${y}`;
+                        }).join(' ');
+                    })
+                    .attr('fill', (d, i) => colorScale(i))
+                    .attr('fill-opacity', 0.3)
+                    .attr('stroke', (d, i) => colorScale(i))
+                    .attr('stroke-width', 2)
+                    .attr('data-country', d => d.country)
+                    .on('mouseover', (event, d) => {
+                        tooltip.transition()
+                            .duration(200)
+                            .style('opacity', .9);
+                        tooltip.html(Object.entries(d.metrics)
+                            .map(([metric, value]) => 
+                                `${metric}: ${(value * 100).toFixed(2)}%`
+                            ).join('<br>'))
+                            .style('left', (event.pageX + 10) + 'px')
+                            .style('top', (event.pageY - 28) + 'px');
+                    })
+                    .on('mouseout', () => {
+                        tooltip.transition()
+                            .duration(500)
+                            .style('opacity', 0);
+                    });
+
+                // Legend
+                const legendItems = d3.select(this.legendId)
+                    .selectAll('.legend-item')
+                    .data(this.normalizedData)
+                    .enter()
+                    .append('div')
+                    .attr('class', 'legend-item')
+                    .on('mouseover', function(event, d) {
+                        // Reset all polygons
+                        d3.selectAll('.radar-polygon')
+                            .attr('fill-opacity', 0.1)
+                            .attr('stroke-width', 1);
+                        
+                        // Highlight the hovered country's polygon
+                        d3.selectAll('.radar-polygon')
+                            .filter(polygon => polygon.country === d.country)
+                            .attr('fill-opacity', 0.7)
+                            .attr('stroke-width', 3);
+                    })
+                    .on('mouseout', () => {
+                        // Reset all polygons to default state
+                        d3.selectAll('.radar-polygon')
+                            .attr('fill-opacity', 0.3)
+                            .attr('stroke-width', 2);
+                    });
+
+                legendItems.append('div')
+                    .attr('class', 'legend-color-box')
+                    .style('background-color', (d, i) => colorScale(i));
+
+                legendItems.append('text')
+                    .text(d => d.country);
+            }
+        }
+
+        // Initialize the chart
+        new RadarChart('#chart', '#legend', data);
+
+        // d3.csv("./datasets/world-happiness-report-2005-2021.csv").then(function(data) {
+        //     var filteredData = [];
+
+        //     data.map(d =>
+        //         {
+        //             if(d.year == 2021)
+        //             {
+        //                 filteredData.push(d);
+        //             }
+        //         }
+        //     )
+        //     console.log('here is the data', filteredData);
+            
+        //     new RadarChart('#chart', '#legend', filteredData);
+        // });
+    </script>
+    </body>
+</html>
