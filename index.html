@@ -7,6 +7,7 @@
         <script src="https://d3js.org/d3.v4.js"></script>
         <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
         <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+        <link rel="stylesheet" href="index.css">
         <style>
             body{
                 display: flex;
@@ -36,19 +37,34 @@
                 border-radius: 20px;
                 background-color: #A4D7E1;
             }
+            .tooltip {
+                border-radius: 10.px;
+            }
 
     </style>
     </head>
     <body>
         <h1>Course Project</h1>
         <h3> Kyndra-Max-Preetham-Shashank-Worifung-Private</h3>
+        <h1>World <em><strong>Happiness</strong></em> map</h1>
+        <p style="width: 90%;">Life, liberty, and the pursuit of <strong>happiness</strong>—three pillars that define the essence of human freedom. While life offers the journey and liberty the choice, it is <strong>happiness</strong> that remains the ultimate destination, a personal and ever-evolving truth. This map charts the varied paths people take in their search for fulfillment, highlighting the places where <strong>happiness</strong> flourishes and reminding us that, at its core, the pursuit of <strong>happiness</strong> is not just a right, but a shared human quest for meaning and connection.</p>
         <div class="map">
-            <h1>World population map</h1>
-            <div id="yearSelector">Please select a year:</div>
+            <!-- <div id="yearSelector">Please select a year:</div> -->
+             <div class="yearControls">
+                <h2>Select a year</h2>
+                 
+                 <div id="radioButtons"> </div>
+                </div>
 
             <div class="tooltip"
                 style="position: absolute; opacity: 0; background: white; padding: 5px; border: 1px solid black; pointer-events: none;"></div>
-            <svg id="my_dataviz" width="800" height="450"></svg></div>
+
+            <svg id="my_dataviz" width="750" height="475"></svg>
+            <div style="margin: 0 10px 0 10px; text-align: center;">
+                <h2>Map Legend</h2>
+                <svg id="chloropleth_legend"></svg>
+            </div> 
+        </div>
         <!-- tooltip for choropleth map -->
 
         <script src='choroplethMap.js'></script>

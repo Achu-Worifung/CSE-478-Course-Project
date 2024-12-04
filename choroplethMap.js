@@ -23,6 +23,8 @@ const tooltip = d3.select(".tooltip");
 
 function loadData(year) {
     console.log("Loading data for year:", year);
+    year = year.toString();
+    selectedYear = year;
     
     // Clear existing map
     svg.selectAll("*").remove();
@@ -109,8 +111,9 @@ function ready(error, topo, yearData) {
         const score = yearData.get(d.properties.name) || "No data";
         tooltip
             .style("opacity", 1)
+            .style('border-radius', '5px')
             .html(`
-                Country name: ${d.properties.name}
+                <strong>${d.properties.name}</strong>
                 <br> Ladder score: ${score}
                 <br> Year: ${selectedYear}
             `)
@@ -165,8 +168,95 @@ function createYearSelector() {
         selectedYear = e.target.value;
         loadData(selectedYear);
     });
+    //radio button
+} function createRadioButtons() {
+    const radioButtons = document.getElementById("radioButtons");
+    for (let i = 2005; i <= 2021; i++) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'radio-wrapper';
+        
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'year';
+        input.value = i;
+        input.id = `year-${i}`;
+        input.onclick = () => loadData(i);
+        if (i === 2021) input.checked = true;
+
+        const label = document.createElement('label');
+        label.htmlFor = `year-${i}`;
+        label.className = 'radio-custom';
+        label.textContent = i;
+
+        wrapper.appendChild(input);
+        wrapper.appendChild(label);
+        radioButtons.appendChild(wrapper);
+    }
+
+    // Add click event to show selected year (optional)
+    radioButtons.addEventListener('click', (e) => {
+        if (e.target.classList.contains('radio-custom')) {
+            const selectedYear = e.target.previousElementSibling.value;
+            console.log(`Selected Year: ${selectedYear}`);
+        }
+    });
 }
 
-// Initialize the visualization
-createYearSelector();
+// legend
+function addLegend() {
+    const legendSvg = d3.select("#chloropleth_legend");
+    const legendWidth = 20;  
+    const legendHeight = 300;
+
+    // Set SVG dimensions
+    legendSvg
+        .attr("width", legendWidth + 50) 
+        .attr("height", legendHeight + 30); 
+
+    // Create a gradient for the legend
+    const defs = legendSvg.append("defs");
+    const linearGradient = defs.append("linearGradient")
+        .attr("id", "legend-gradient")
+        .attr("x1", "0%")
+        .attr("x2", "0%")
+        .attr("y1", "100%")  
+        .attr("y2", "0%");
+
+    // Define color stops for the gradient
+    const colorDomain = d3.range(0, 11); 
+    colorDomain.forEach((d, i) => {
+        linearGradient.append("stop")
+            .attr("offset", `${(i / (colorDomain.length - 1)) * 100}%`)
+            .attr("stop-color", colorScale(d));
+    });
+
+    // Add the gradient rectangle
+    legendSvg.append("rect")
+        .attr("x", 10)
+        .attr("y", 10)
+        .attr("width", legendWidth)
+        .attr("height", legendHeight)
+        .style("fill", "url(#legend-gradient)")
+        .style("stroke", "black");
+
+    // Add scale labels
+    const legendScale = d3.scaleLinear()
+        .domain(colorScale.domain()) // [0, 10]
+        .range([legendHeight + 10, 10]); 
+    const legendAxis = d3.axisRight(legendScale)
+        .ticks(5)
+        .tickFormat(d3.format(".1f")); 
+
+    // Append axis
+    legendSvg.append("g")
+        .attr("transform", `translate(${10 + legendWidth}, 0)`) 
+        .call(legendAxis);
+}
+
+
+
+
+
+addLegend();
 loadData("2021");
+createRadioButtons();

@@ -6,10 +6,23 @@
         <title>Document</title>
         <script src="https://d3js.org/d3.v6.js"></script>
         <style>
+            *
+            {
+                font-size: large  ;
+                font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            }
             .controls 
             {
                 display: flex;
                 flex-direction: row;
+            }
+            body 
+            {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                justify-content: center;
             }
         </style>
 
@@ -19,34 +32,29 @@
             <h2>World Happiness Report</h2>
             <h1 class="text-center">Homework #2: D3 Simple</h1>
             <h3 class="text-center">Worifung Achu - wachu1@asu.edu</h3>
+            <h3>click on a bubble to see more details</h3>
 
         </div>
         <div class="controls">
             <div>
                 <label for="x-axis">year:</label>
                 <select id='year'>
-                    <option value="2021">2021</option>
-                    <option value="2020">2020</option>
-                    <option value="2019">2019</option>
+                    
                 </select>
             </div>
-            <!-- // var newValue = parse
-            // console.log(Math.round(parseFloat(value) * 100) / 100);
-            
-            // 'Log GDP per capita', 
-            //     'Social support', 
-            //     'Healthy life expectancy at birth', 
-            //     'Freedom to make life choices', 
-            //     'Generosity', 
-            //     'Perceptions of corruption' -->
+   
             <div class="selector">
                 <label for="y-axis">Y-Axis:</label>
                 <select id="y-axis">
-                    <option value = "Healthy life expectancy at birth">life expectancy</option>
-                    <option value = "Freedom to make life choices">freedom</option>
-                    <option value = "Generosity">Generosity</option>
-                    <option value = "Perceptions of corruption">Perception of corruption</option>
-                    <option value="Log GDP per capita">Log GDP percapita</option>
+                    <option value="Healthy life expectancy at birth">life
+                        expectancy</option>
+                    <option
+                        value="Freedom to make life choices">freedom</option>
+                    <option value="Generosity">Generosity</option>
+                    <option value="Perceptions of corruption">Perception of
+                        corruption</option>
+                    <option value="Log GDP per capita">Log GDP
+                        percapita</option>
                     <option value="Social support">Social support</option>
                 </select>
             </div>
@@ -56,8 +64,8 @@
 
         <script>
             const margin = { top: 10, right: 20, bottom: 30, left: 50 },
-                width = 900 - margin.left - margin.right,
-                height = 700 - margin.top - margin.bottom;
+                width = 850 - margin.left - margin.right,
+                height = 600 - margin.top - margin.bottom;
         
             const svg = d3.select("#chart")
                 .append("g")
@@ -77,6 +85,13 @@
         
             d3.csv('./datasets/world-happiness-report-2005-2021.csv').then(function (data) {
                 const yearSelect = document.getElementById('year');
+                //populating the year selector box
+                for (let i = 2021; i >= 2005; i--) {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.textContent = i;
+                    yearSelect.appendChild(option);
+                }
                 const yAxisSelect = document.getElementById('y-axis');
         
                 function updateChart() {
@@ -93,6 +108,8 @@
         
             function drawData(data, year, yVariable) {
                 svg.selectAll("*").remove();
+
+
         
                 data = data.filter(d => d.year == year);
         
@@ -104,7 +121,22 @@
                     .range([height, 0]);
                 svg.append("g").call(d3.axisLeft(y));
         
-                const z = d3.scaleLinear().domain(d3.extent(data, d => +d[yVariable])).range([2, 10]);
+                const z = d3.scaleLinear().domain(d3.extent(data, d => +d[yVariable])).range([3, 10]);
+
+                // Add X axis label:
+svg.append("text")
+    .attr("text-anchor", "end")
+    .attr("x", width)
+    .attr("y", height + margin.top + 25)
+    .text("Ladder Score");
+
+    // Y axis label:
+svg.append("text")
+    .attr("text-anchor", "end")
+    .attr("transform", "rotate(-90)")
+    .attr("y", -margin.left+15)
+    .attr("x", -margin.top)
+    .text(yVariable);
         
                 svg.append("g")
                     .selectAll("circle")
@@ -117,7 +149,7 @@
                     .style("opacity", 0.7)
                     .on("mouseover", function (event, d) {
     tooltip.style("visibility", "visible")
-        .html(`<strong>${d['Country name']}</strong><br>${yVariable}: ${d[yVariable]}`);
+        .html(`<strong>${d['Country name']}</strong><br>${yVariable}: ${d[yVariable]}<br>Ladder score: ${d['Ladder score']}`);
     d3.select(this).style("stroke", "black").style("stroke-width", 2);
 })
 .on("mousemove", function (event) {
