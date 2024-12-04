@@ -4,22 +4,21 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Data Visualization Project</title>
+        <!-- Load D4 and dependencies for choropleth map -->
         <script src="https://d3js.org/d3.v4.js"></script>
         <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
         <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
         <link rel="stylesheet" href="index.css">
         <style>
-            body{
+            body {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 text-align: center;
                 width: 100vw;
                 min-width: 1000px;
-
             }
-            select 
-            {
+            select {
                 width: 100px;
                 text-align: center;
                 padding: 5px;
@@ -29,35 +28,48 @@
             #yearSelector {
                 font-size: large;
             }
-            #my_dataviz
-
-            {
+            #my_dataviz {
                 border: 1px solid black;
                 margin-bottom: 29px;
                 border-radius: 20px;
                 background-color: #A4D7E1;
             }
             .tooltip {
-                border-radius: 10.px;
+                border-radius: 10px;
             }
-
-    </style>
+            
+            /* Add separator between visualizations */
+            .visualization-separator {
+                width: 80%;
+                margin: 40px 0;
+                border-top: 2px solid #ccc;
+            }
+            
+            /* Container for the heatmap */
+            #happiness-heatmap-container {
+                width: 90%;
+                margin: 20px auto;
+                padding: 20px;
+                background-color: white;
+                border-radius: 10px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+        </style>
     </head>
     <body>
         <h1>Course Project</h1>
-        <h3> Kyndra-Max-Preetham-Shashank-Worifung-Private</h3>
+        <h3>Kyndra-Max-Preetham-Shashank-Worifung-Private</h3>
         <h1>World <em><strong>Happiness</strong></em> map</h1>
         <p style="width: 90%;">Life, liberty, and the pursuit of <strong>happiness</strong>—three pillars that define the essence of human freedom. While life offers the journey and liberty the choice, it is <strong>happiness</strong> that remains the ultimate destination, a personal and ever-evolving truth. This map charts the varied paths people take in their search for fulfillment, highlighting the places where <strong>happiness</strong> flourishes and reminding us that, at its core, the pursuit of <strong>happiness</strong> is not just a right, but a shared human quest for meaning and connection.</p>
+        
+        <!-- Choropleth Map Section -->
         <div class="map">
-            <!-- <div id="yearSelector">Please select a year:</div> -->
-             <div class="yearControls">
+            <div class="yearControls">
                 <h2>Select a year</h2>
-                 
-                 <div id="radioButtons"> </div>
-                </div>
+                <div id="radioButtons"></div>
+            </div>
 
-            <div class="tooltip"
-                style="position: absolute; opacity: 0; background: white; padding: 5px; border: 1px solid black; pointer-events: none;"></div>
+            <div class="tooltip" style="position: absolute; opacity: 0; background: white; padding: 5px; border: 1px solid black; pointer-events: none;"></div>
 
             <svg id="my_dataviz" width="750" height="475"></svg>
             <div style="margin: 0 10px 0 10px; text-align: center;">
@@ -65,8 +77,53 @@
                 <svg id="chloropleth_legend"></svg>
             </div> 
         </div>
-        <!-- tooltip for choropleth map -->
 
+        <!-- Separator -->
+        <div class="visualization-separator"></div>
+
+        <!-- Happiness Heatmap Section -->
+        <div id="happiness-heatmap-container"></div>
+
+        <!-- Load choropleth map script -->
         <script src='choroplethMap.js'></script>
+
+        <!-- Script to handle D3 versions and initialize heatmap -->
+        <script>
+            // Function to load D3 v7 and initialize heatmap
+            function initializeHeatmap() {
+                // Create script element for D3 v7
+                const d3Script = document.createElement('script');
+                d3Script.src = 'https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js';
+                
+                d3Script.onload = function() {
+                    // Store D3 v7 in a different variable
+                    window.d3v7 = window.d3;
+                    // Restore D3 v4
+                    window.d3 = d3v4;
+                    
+                    // Now load the heatmap script
+                    const heatmapScript = document.createElement('script');
+                    heatmapScript.src = 'happiness-heatmap.js';
+                    
+                    heatmapScript.onload = function() {
+                        // Initialize the heatmap
+                        if (window.HappinessHeatmap) {
+                            window.HappinessHeatmap.init('happiness-heatmap-container', {
+                                dataPath: 'datasets/'
+                            });
+                        }
+                    };
+                    
+                    document.body.appendChild(heatmapScript);
+                };
+                
+                // Store D3 v4 reference before loading v7
+                const d3v4 = window.d3;
+                document.body.appendChild(d3Script);
+            }
+
+            // Initialize after a short delay to ensure choropleth is loaded
+            setTimeout(initializeHeatmap, 1000);
+        </script>
     </body>
 </html>
