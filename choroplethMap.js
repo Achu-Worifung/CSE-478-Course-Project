@@ -1,6 +1,8 @@
+// Load a specific version of D3 for this script to avoid conflicts with other versions
 let scopedD3; // Variable to hold the scoped D3 instance
-let selectedYear = "2021";
+let selectedYear = "2021"; // Default year to load
 
+// Function to dynamically load D3 v5 and assign it to a scoped variable
 function loadScopedD3(callback) {
     const script = document.createElement("script");
     script.src = "https://d3js.org/d3.v5.min.js";
@@ -12,6 +14,7 @@ function loadScopedD3(callback) {
     document.head.appendChild(script);
 }
 
+// Function to load data for the selected year
 function loadData(year) {
     console.log("Loading data for year:", year);
     year = year.toString();
@@ -20,6 +23,7 @@ function loadData(year) {
     const svg = scopedD3.select("#my_dataviz");
     svg.selectAll("*").remove(); // Clear existing map
 
+    // Load GeoJSON and CSV data using Promises
     Promise.all([
         scopedD3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson"),
         fetch("./datasets/world-happiness-report-2005-2021.csv")
@@ -30,6 +34,7 @@ function loadData(year) {
             console.log("GeoJSON Data Loaded:", topo);
             console.log("CSV Data Loaded:", csvData);
 
+            // Process data for the selected year
             const yearData = new Map();
             csvData.forEach(d => {
                 if (d.year === year) {
@@ -37,13 +42,14 @@ function loadData(year) {
                 }
             });
 
-            ready(topo, yearData);
+            ready(topo, yearData); // Draw the map with the processed data
         })
         .catch(function (error) {
             console.error("Error loading data:", error);
         });
 }
 
+// Function to render the map with the provided data
 function ready(topo, yearData) {
     const svg = scopedD3.select("#my_dataviz");
     const projection = scopedD3
@@ -58,6 +64,7 @@ function ready(topo, yearData) {
         .domain([0, 10])
         .interpolator(scopedD3.interpolateBlues);
 
+    // Append paths for countries and apply styles based on data
     svg.append("g")
         .selectAll("path")
         .data(topo.features)
@@ -73,11 +80,13 @@ function ready(topo, yearData) {
         .style("opacity", 0.8);
 }
 
+// Function to add the legend to the map
 function addLegend() {
     const legendSvg = scopedD3.select("#chloropleth_legend");
     const legendWidth = 20;
     const legendHeight = 300;
 
+    // Set up the SVG container and gradient for the legend
     legendSvg
         .attr("width", legendWidth + 50)
         .attr("height", legendHeight + 30);
@@ -90,6 +99,7 @@ function addLegend() {
         .attr("y1", "100%")
         .attr("y2", "0%");
 
+    // Define color stops for the gradient
     const colorDomain = scopedD3.range(0, 11);
     const colorScale = scopedD3
         .scaleSequential()
@@ -102,6 +112,7 @@ function addLegend() {
             .attr("stop-color", colorScale(d));
     });
 
+    // Draw the gradient rectangle
     legendSvg.append("rect")
         .attr("x", 10)
         .attr("y", 10)
@@ -110,6 +121,7 @@ function addLegend() {
         .style("fill", "url(#legend-gradient)")
         .style("stroke", "black");
 
+    // Add a scale and axis for the legend
     const legendScale = scopedD3.scaleLinear()
         .domain(colorScale.domain())
         .range([legendHeight + 10, 10]);
@@ -122,6 +134,7 @@ function addLegend() {
         .call(legendAxis);
 }
 
+// Function to create radio buttons for year selection
 function createRadioButtons() {
     const radioButtons = document.getElementById("radioButtons");
     for (let i = 2005; i <= 2021; i++) {
@@ -135,7 +148,7 @@ function createRadioButtons() {
         input.id = `year-${i}`;
         input.addEventListener("change", function () {
             if (this.checked) {
-                loadData(i);
+                loadData(i); // Load data for the selected year
             }
         });
         if (i === 2021) input.checked = true;
@@ -151,11 +164,12 @@ function createRadioButtons() {
     }
 }
 
+// Initialization function to load the map and legend on page load
 document.addEventListener("DOMContentLoaded", () => {
     loadScopedD3(() => {
         console.log("Initializing...");
-        addLegend();
-        createRadioButtons();
-        loadData("2021");
+        addLegend(); // Add the legend
+        createRadioButtons(); // Create year selection buttons
+        loadData("2021"); // Load the map with default year
     });
 });
