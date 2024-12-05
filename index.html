@@ -126,4 +126,71 @@
             setTimeout(initializeHeatmap, 1000);
         </script>
     </body>
+</html><!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Data Visualization Project</title>
+        <!-- Keep D3 v7 as it was being used successfully before -->
+        <script src="https://d3js.org/d3v7.js"></script>
+        <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+        <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+        <link rel="stylesheet" href="index.css">
+        <style>
+            /* Keep your existing styles exactly as they were */
+            body{
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                width: 100vw;
+                min-width: 1000px;
+            }
+            select 
+            {
+                width: 100px;
+                text-align: center;
+                padding: 5px;
+                font-size: large;
+                margin-bottom: 15px;
+            }
+            #yearSelector {
+                font-size: large;
+            }
+            #my_dataviz
+            {
+                border: 1px solid black;
+                margin-bottom: 29px;
+                border-radius: 20px;
+                background-color: #A4D7E1;
+            }
+            .tooltip {
+                border-radius: 10.px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Course Project</h1>
+        <h3> Kyndra-Max-Preetham-Shashank-Worifung-Private</h3>
+        <h1>World <em><strong>Happiness</strong></em> map</h1>
+        <p style="width: 90%;">Life, liberty, and the pursuit of <strong>happiness</strong>—three pillars that define the essence of human freedom. While life offers the journey and liberty the choice, it is <strong>happiness</strong> that remains the ultimate destination, a personal and ever-evolving truth. This map charts the varied paths people take in their search for fulfillment, highlighting the places where <strong>happiness</strong> flourishes and reminding us that, at its core, the pursuit of <strong>happiness</strong> is not just a right, but a shared human quest for meaning and connection.</p>
+        <div class="map">
+            <div class="yearControls">
+                <h2>Select a year</h2>
+                <div id="radioButtons"></div>
+            </div>
+
+            <div class="tooltip" style="position: absolute; opacity: 0; background: white; padding: 5px; border: 1px solid black; pointer-events: none;"></div>
+
+            <svg id="my_dataviz" width="750" height="475"></svg>
+            <div style="margin: 0 10px 0 10px; text-align: center;">
+                <h2>Map Legend</h2>
+                <svg id="chloropleth_legend"></svg>
+            </div> 
+        </div>
+
+        <!-- Move the choropleth script to the end of body -->
+        <script src='choroplethMap.js'></script>
+    </body>
 </html>

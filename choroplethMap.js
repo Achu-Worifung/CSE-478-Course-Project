@@ -29,64 +29,60 @@ function loadData(year) {
     // Clear existing map
     svg.selectAll("*").remove();
 
-    // Load GeoJSON and CSV data using d3.queue()
-    d3.queue()
-        .defer(d3.json, "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson")
-        .defer(d3.csv, "./datasets/world-happiness-report-2005-2021.csv")
-        .await(function(error, topo, csvData) {
-            if (error) {
-                console.error("Error loading data:", error);
-                drawBlankMap();
-                return;
+    // Use Promise.all instead of d3.queue
+    Promise.all([
+        d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson"),
+        d3.csv("./datasets/world-happiness-report-2005-2021.csv")
+    ]).then(function([topo, csvData]) {
+        // Create a map of country data for the selected year
+        const yearData = new Map();
+        csvData.forEach(d => {
+            if (d.year === year) {
+                yearData.set(d["Country name"], +d["Ladder score"]);
             }
-
-            // Create a map of country data for the selected year
-            const yearData = d3.map();
-            csvData.forEach(d => {
-                if (d.year === year) {
-                    yearData.set(d["Country name"], +d["Ladder score"]);
-                }
-            });
-
-            ready(null, topo, yearData);
         });
+
+        ready(null, topo, yearData);
+    }).catch(function(error) {
+        console.error("Error loading data:", error);
+        drawBlankMap();
+    });
 }
 
 function drawBlankMap() {
-    d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson", function(error, geoData) {
-        if (error) {
+    d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson")
+        .then(function(geoData) {
+            svg.append("g")
+                .selectAll("path")
+                .data(geoData.features)
+                .enter()
+                .append("path")
+                .attr("d", path)
+                .attr("class", "Country")
+                .style("fill", "lightgray")
+                .style("stroke", "black")
+                .style("opacity", 0.8)
+                .on("mouseover", function(event, d) {
+                    d3.select(this).transition().duration(200).style("opacity", 1);
+                    
+                    tooltip.html(`
+                        <h3 style="color: red; margin: 0; padding: 0;">Dataset failed to load.</h3>
+                        <br> Country name: ${d.properties.name} 
+                        <br> Ladder score: undefined 
+                        <br> Year: ${selectedYear || "N/A"}
+                    `)
+                        .style("left", (event.pageX + 5) + "px")
+                        .style("top", (event.pageY - 28) + "px")
+                        .style("opacity", 1);
+                })
+                .on("mouseleave", function() {
+                    d3.select(this).transition().duration(200).style("opacity", 0.8);
+                    tooltip.style("opacity", 0);
+                });
+        })
+        .catch(function(error) {
             console.error("Error loading GeoJSON:", error);
-            return;
-        }
-
-        svg.append("g")
-            .selectAll("path")
-            .data(geoData.features)
-            .enter()
-            .append("path")
-            .attr("d", path)
-            .attr("class", "Country")
-            .style("fill", "lightgray")
-            .style("stroke", "black")
-            .style("opacity", 0.8)
-            .on("mouseover", function(d) {
-                d3.select(this).transition().duration(200).style("opacity", 1);
-                
-                tooltip.html(`
-                    <h3 style="color: red; margin: 0; padding: 0;">Dataset failed to load.</h3>
-                    <br> Country name: ${d.properties.name} 
-                    <br> Ladder score: undefined 
-                    <br> Year: ${selectedYear || "N/A"}
-                `)
-                    .style("left", (d3.event.pageX + 5) + "px")
-                    .style("top", (d3.event.pageY - 28) + "px")
-                    .style("opacity", 1);
-            })
-            .on("mouseleave", function() {
-                d3.select(this).transition().duration(200).style("opacity", 0.8);
-                tooltip.style("opacity", 0);
-            });
-    });
+        });
 }
 
 function ready(error, topo, yearData) {
@@ -96,7 +92,7 @@ function ready(error, topo, yearData) {
         return;
     }
 
-    const mouseOver = function(d) {
+    const mouseOver = function(event, d) {
         d3.selectAll(".Country")
             .transition()
             .duration(200)
@@ -117,8 +113,8 @@ function ready(error, topo, yearData) {
                 <br> Ladder score: ${score}
                 <br> Year: ${selectedYear}
             `)
-            .style("left", (d3.event.pageX + 5) + "px")
-            .style("top", (d3.event.pageY - 28) + "px");
+            .style("left", (event.pageX + 5) + "px")
+            .style("top", (event.pageY - 28) + "px");
     };
 
     const mouseLeave = function() {
@@ -153,23 +149,7 @@ function ready(error, topo, yearData) {
         .on("mouseleave", mouseLeave);
 }
 
-// Create year selector
-function createYearSelector() {
-    const yearSelector = document.getElementById("yearSelector");
-    let html = '<select id="yearSelector">';
-    for (let i = 2005; i <= 2021; i++) {
-        html += `<option value="${i}" ${i === 2021 ? 'selected' : ''}>${i}</option>`;
-    }
-    html += '</select>';
-    yearSelector.innerHTML = html;
-
-    // Add event listener
-    yearSelector.querySelector('select').addEventListener("change", function(e) {
-        selectedYear = e.target.value;
-        loadData(selectedYear);
-    });
-    //radio button
-} function createRadioButtons() {
+function createRadioButtons() {
     const radioButtons = document.getElementById("radioButtons");
     for (let i = 2005; i <= 2021; i++) {
         const wrapper = document.createElement('div');
@@ -180,7 +160,11 @@ function createYearSelector() {
         input.name = 'year';
         input.value = i;
         input.id = `year-${i}`;
-        input.onclick = () => loadData(i);
+        input.addEventListener('change', function() {
+            if (this.checked) {
+                loadData(i);
+            }
+        });
         if (i === 2021) input.checked = true;
 
         const label = document.createElement('label');
@@ -192,17 +176,8 @@ function createYearSelector() {
         wrapper.appendChild(label);
         radioButtons.appendChild(wrapper);
     }
-
-    // Add click event to show selected year (optional)
-    radioButtons.addEventListener('click', (e) => {
-        if (e.target.classList.contains('radio-custom')) {
-            const selectedYear = e.target.previousElementSibling.value;
-            console.log(`Selected Year: ${selectedYear}`);
-        }
-    });
 }
 
-// legend
 function addLegend() {
     const legendSvg = d3.select("#chloropleth_legend");
     const legendWidth = 20;  
@@ -241,7 +216,7 @@ function addLegend() {
 
     // Add scale labels
     const legendScale = d3.scaleLinear()
-        .domain(colorScale.domain()) // [0, 10]
+        .domain(colorScale.domain())
         .range([legendHeight + 10, 10]); 
     const legendAxis = d3.axisRight(legendScale)
         .ticks(5)
@@ -251,12 +226,24 @@ function addLegend() {
     legendSvg.append("g")
         .attr("transform", `translate(${10 + legendWidth}, 0)`) 
         .call(legendAxis);
+        
 }
 
-
-
-
-
-addLegend();
-loadData("2021");
-createRadioButtons();
+// Initialize the visualization
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        addLegend();
+        createRadioButtons();
+        
+        // Wait for the SVG element to be ready
+        setTimeout(() => {
+            const radio2021 = document.querySelector('input[value="2021"]');
+            if (radio2021) {
+                radio2021.checked = true;
+                loadData("2021");
+            }
+        }, 500);
+    } catch (error) {
+        console.error("Initialization error:", error);
+    }
+});
