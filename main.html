@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Health and Wellness Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="dashboard-container">
+        <h1>Health and Wellness Dashboard</h1>
+        <p>Explore health factors such as life expectancy, healthcare expenditure, and happiness.</p>
+
+        <div id="filter-container">
+            <label for="year-filter">Select a Year:</label>
+            <select id="year-filter">
+                <option value="" disabled selected>Select Year</option>
+            </select>
+
+            <label for="country-filter">Select a Country:</label>
+            <select id="country-filter">
+                <option value="" disabled selected>All Countries</option>
+            </select>
+        </div>
+
+        <div id="comparison-container">
+            <div id="country-info">
+                <p><strong>Country Details:</strong></p>
+                <p>Select a country to see details here.</p>
+            </div>
+            
+        </div>
+        
+
+        <div id="chart"></div>
+    </div>
+
+    <!-- Include D3.js library -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- Include your JavaScript file -->
+    <script src="H&W-Dashboard.js"></script>
+</body>
+</html>
