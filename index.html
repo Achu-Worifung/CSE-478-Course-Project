@@ -11,6 +11,7 @@
         <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
 
         <link rel="stylesheet" href="index.css">
+        <link rel="stylesheet" href="scatterplotstyles.css">
         <style>
             body {
                 display: flex;
@@ -148,6 +149,46 @@
             // Initialize after a short delay to ensure choropleth is loaded
             setTimeout(initializeHeatmap, 1000);
         </script>
+
+<div id="scatterplot_div" class="scatterplot">
+    <h1>Income vs. Happiness Scatterplot</h1>
+
+    <div class="scatterplot-row">
+      <!-- Left column - Scatterplot -->
+      <div class="scatterplot-column">
+        <svg id="scatterplot_svg" width="800" height="450"></svg>
+        <div id="tooltipScatterplot"></div>
+      </div>
+
+      <!-- Right column - Controls -->
+      <div class="scatterplot-column controls-column">
+        <div class="control-pair">
+          <label for="scatterplotYearDropdown">Year:</label>
+          <select id="scatterplotYearDropdown"></select>
+        </div>
+
+        <div class="control-pair">
+          <label for="scatterplot-country">Country:</label>
+          <!-- style="display: none;" -->
+          <select style="display: none;" id="scatterplot-country"></select>
+          <div id="country-hover-list" class="country-hover-list"></div>
+        </div>
+
+        <div class="control-pair">
+          <label for="scatterplot-x-attribute">X:</label>
+          <select id="scatterplot-x-attribute"></select>
+        </div>
+
+        <div class="control-pair">
+          <label for="scatterplot-y-attribute">Y:</label>
+          <select id="scatterplot-y-attribute"></select>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <script src="scatterplot.js"></script>
+
     </body>
 </html><!DOCTYPE html>
 <html lang="en">
