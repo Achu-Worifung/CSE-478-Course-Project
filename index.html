@@ -8,6 +8,8 @@
         <script src="https://d3js.org/d3.v4.js"></script>
         <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
         <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+
         <link rel="stylesheet" href="index.css">
         <style>
             body {
@@ -80,12 +82,33 @@
 
         <!-- Separator -->
         <div class="visualization-separator"></div>
-
+        
         <!-- Happiness Heatmap Section -->
         <div id="happiness-heatmap-container"></div>
 
+        <!-- Separator -->
+        <div class="visualization-separator"></div>
+
+        <!-- Radial + TreeMap Section -->
+        <div style="width: 1250px; height: 1100px;">
+            <h1>Investigate Happiness Factors by Region</h1>
+            <svg id="radial-diagram-5" width="1100px" height="600px" border="none"></svg>
+            <div id="treemap-radial" style="width: 1100px; height: 350px; display: flex; justify-content: center; align-items: center; margin: auto;"></div>
+            <div id="treemap-legend" style="width: 1100px; margin: auto; display: flex; justify-content: center; align-items: center;">
+                <svg id="horizontal-legend" width="100%" height="50px"></svg>
+            </div>
+            <div id="tooltip_5" style="position: absolute; background-color: white; border: 1px solid gray; border-radius: 5px; padding: 10px; font-size: 15px; color: black; display: none; pointer-events: none; z-index: 10;">
+            </div>
+        </div>
+
+        <!-- Separator -->
+        <div class="visualization-separator"></div>
+
         <!-- Load choropleth map script -->
         <script src='choroplethMap.js'></script>
+
+        <!-- Load Radial + TreeMap script -->
+        <script src="radial-treemap.js"></script>
 
         <!-- Script to handle D3 versions and initialize heatmap -->
         <script>
