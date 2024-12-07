@@ -493,8 +493,6 @@
     "Freedom to make life choices",
     "Generosity",
     "Perceptions of corruption",
-    "Positive affect",
-    "Negative affect",
   ];
 
   // fill dropdowns
