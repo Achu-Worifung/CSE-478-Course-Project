@@ -75,7 +75,7 @@
                 <div id="radioButtons"></div>
             </div>
 
-            <div class="tooltip" style="position: absolute; opacity: 0; background: white; padding: 5px; border: 1px solid black; pointer-events: none;"></div>
+            <div class="tooltipchoropleth" style="position: absolute; opacity: 0; background: white; padding: 5px; border: 1px solid black; pointer-events: none;"></div>
 
             <svg id="my_dataviz" width="750" height="475"></svg>
             <div style="margin: 0 10px 0 10px; text-align: center;">
@@ -94,9 +94,10 @@
         <div class="visualization-separator"></div>
 
         <!-- Radial + TreeMap Section -->
-        <div style="width: 1250px; height: 1100px;">
+        <div style="width: 1250px; height: 1100px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: none;">
             <h1>Investigate Happiness Factors by Region</h1>
-            <svg id="radial-diagram-5" width="1100px" height="600px" border="none"></svg>
+            <p style="width: 80%; text-align: center; align-self: center;">Geography has long shaped the fortunes of those born within its borders. From fertile lands to bustling trade routes, prosperity—and happiness—often hinges on place. This map of regional happiness factors reveals how location influences well-being, highlighting disparities and shared aspirations across the globe.</p>
+            <svg id="radial-diagram-5" width="1100px" height="700px" border="none"></svg>
             <div id="treemap-radial" style="width: 1100px; height: 350px; display: flex; justify-content: center; align-items: center; margin: auto;"></div>
             <div id="treemap-legend" style="width: 1100px; margin: auto; display: flex; justify-content: center; align-items: center;">
                 <svg id="horizontal-legend" width="100%" height="50px"></svg>
@@ -188,6 +189,8 @@
 
         <div id="scatterplot_div" class="scatterplot">
             <h1>Income vs. Happiness Scatterplot</h1>
+
+            <p>Are the rich truly happier than the poor? The free more fulfilled than the enslaved? The generous more content than the greedy? This simple yet compelling scatter plot explores these relationships, revealing how wealth, freedom, and generosity intersect with the elusive pursuit of happiness.</p>
 
             <div class="scatterplot-row">
               <!-- Left column - Scatterplot -->
