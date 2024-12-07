@@ -12,7 +12,7 @@
                 .happiness-heatmap-cell-hover {
                     position: absolute;
                     background: white;
-                    padding: 8px;
+                    padding: 4px;
                     border: 1px solid #ccc;
                     border-radius: 4px;
                     pointer-events: none;
@@ -22,7 +22,7 @@
                     z-index: 1000;
                 }
                 .happiness-heatmap-viz {
-                    overflow-x: auto;
+                    overflow-x: hidden;
                 }
                 .happiness-heatmap-header-cell {
                     cursor: pointer;
@@ -37,6 +37,7 @@
                     padding: 8px 16px;
                     margin: 0 5px;
                     cursor: pointer;
+                    width: 100px;
                 }
                 .happiness-heatmap-search-container {
                     text-align: center;
@@ -52,6 +53,13 @@
                     text-align: center;
                     padding: 20px;
                 }
+                #happiness-heatmap-container{
+                margin:0;
+                display:flex;
+                flex-direction:column;
+                }
+                .heatmap-svg {
+                min-width: 1111px}
             `;
             
             const styleSheet = document.createElement('style');
@@ -106,7 +114,8 @@
             // Create SVG container
             this.svg = this.container.select(`.${prefix}-viz`)
                 .append('svg')
-                .attr('width', this.width + this.margin.left + this.margin.right);
+                .attr('width', this.width + this.margin.left + this.margin.right)
+                .attr('class', 'heatmap-svg');
 
             // Create tooltip
             this.tooltip = this.d3.select('body')
@@ -246,7 +255,8 @@
             this.svg.selectAll('*').remove();
 
             const g = this.svg.append('g')
-                .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
+                .attr('transform', `translate(${this.margin.left -this.margin.right},${this.margin.top})`)
+                .attr('min-width', '1111px');
 
             this.createLegend(g);
 
