@@ -30,7 +30,8 @@ svg_5.selectAll(".factor-rect")
     .attr("fill", (d, i) => i < 5 ? '#1f78b4' : '#fec44f')
     .on("mouseover", function () {
         svg_5.selectAll(".factor-rect")
-            .attr("opacity", 0.5);
+            .attr("opacity", 0.5)
+            .attr('cursor', 'pointer');
         d3.select(this).attr("opacity", 1);
     })
     .on("mouseout", function () {
@@ -67,6 +68,7 @@ svg_5.selectAll(".factor-text")
     .enter()
     .append("text")
     .attr("class", "text factor-text")
+    .attr('cursor', 'pointer')
     .attr("x", 20 + rect_width_5 / 2)
     .attr("y", (d, i) => i * (rect_height_5 + spacing_5) + (svg_height_5/3) + rect_height_5 / 2 + 5)
     .attr("text-anchor", "middle")
@@ -86,7 +88,8 @@ svg_5.selectAll(".continent-rect")
     .attr("fill", (d, i) => '#964B00')
     .on("mouseover", function () {
         svg_5.selectAll(".continent-rect")
-            .attr("opacity", 0.5);
+            .attr("opacity", 0.5)
+            .attr('cursor', 'pointer');
         d3.select(this).attr("opacity", 1);
     })
     .on("mouseout", function () {
@@ -120,6 +123,7 @@ svg_5.selectAll(".continent-text")
     .enter()
     .append("text")
     .attr("class", "text continent-text")
+    .attr('cursor', 'pointer')
     .attr("x", 300 + rect_width_5 / 2)
     .attr("y", (d, i) => i * (rect_height_5 + spacing_5) + (svg_height_5/3) + rect_height_5 / 2 + 5)
     .attr("text-anchor", "middle")
